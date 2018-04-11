@@ -714,7 +714,7 @@ contains
   pure function dist_gc(lon1, clat1, slat1, lon2, lat2)
     !! calculate the great circle distance between two points
     
-    real(dp), intent(in) :: lon1, clat1, slat1, 
+    real(dp), intent(in) :: lon1, clat1, slat1
     !! point 1 longitude (degrees), cosine of latitude, sine of latitude
 
     real(dp), intent(in) :: lon2, lat2
