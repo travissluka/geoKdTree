@@ -6,44 +6,48 @@
 ####################################################################
 # FLAGS COMMON TO ALL BUILD TYPES
 ####################################################################
+set( CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -emf -rmoid -lhugetlbfs")
 
 if( HAVE_OMP )
-  set( CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fopenmp")
+  set( CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -homp")
 else( )
-  set( CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fno-openmp")
+  set( CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -hnoomp")
 endif( )
-
-set( CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fdefault-real-8 -fdefault-double-8 -fcray-pointer -fconvert=big-endian -ffree-line-length-none -fno-range-check -fbacktrace")
 
 ####################################################################
 # RELEASE FLAGS
 ####################################################################
 
-set( CMAKE_Fortran_FLAGS_RELEASE "-O3 -funroll-all-loops -finline-functions ")
+set( CMAKE_Fortran_FLAGS_RELEASE "-O3 -hfp3 -hscalar3 -hvector3 -hPIC" )
 
 ####################################################################
 # DEBUG FLAGS
 ####################################################################
 
-set( CMAKE_Fortran_FLAGS_DEBUG   "-O0 -g -fcheck=bounds -ffpe-trap=invalid,zero,overflow,underflow -fbacktrace" )
+set( CMAKE_Fortran_FLAGS_DEBUG   "-O0 -Gfast -Ktrap=fp" )
 
 ####################################################################
 # BIT REPRODUCIBLE FLAGS
 ####################################################################
 
-set( CMAKE_Fortran_FLAGS_BIT     "-O2 -funroll-all-loops -finline-functions" )
+set( CMAKE_Fortran_FLAGS_BIT     "-O2 -hflex_mp=conservative -hadd_paren -hfp1" )
 
 ####################################################################
 # LINK FLAGS
 ####################################################################
 
-set( CMAKE_Fortran_LINK_FLAGS    "" )
+set( CMAKE_Fortran_LINK_FLAGS    "-Wl,-Map,loadmap" )
 
 ####################################################################
 
 # Meaning of flags
 # ----------------
-# -fstack-arrays     : Allocate automatic arrays on the stack (needs large stacksize!!!)
-# -funroll-all-loops : Unroll all loops
-# -fcheck=bounds     : Bounds checking
-
+# -hfp3     : Special optimisation for floating points
+# -Ktrap=fp : Abort on NaN
+# -R b      : Bounds checking
+# -hflex_mp=conservative -hfp1 : Obtain bit-reproducible results
+# -hflex_mp=intolerant -hfp2   : Obtain bit-reproducible results (also)
+# -hadd_paren : encourage left to right fp evaluation
+# -hscalarN , -hvectorN : optimisation for scalar and vectorisation
+# -homp/-hnoomp : Enable/Disable OpenMP
+# -rmoi : create compiler listing
