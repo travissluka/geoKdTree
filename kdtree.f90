@@ -34,8 +34,8 @@ module kdtree
 
   ! private module parameters
   !------------------------------------------------------------
-  integer, parameter :: dp=kind(0.0)
-  !! double definition
+  integer, parameter :: dp=kind(0.0d0)
+  integer, parameter :: sp=kind(0.0e0)
 
   integer, parameter :: kd_dim = 3
   !! 3 dimensions, x/y/z
@@ -139,10 +139,10 @@ contains
     type(KD_ROOT), intent(out)  :: root
     !! the root node of our kd-tree, used by kd_search_nnearest() and kd_search_radius()
 
-    real(dp), intent(in), target :: lats(:)
+    real(sp), intent(in), target :: lats(:)
     !! list of latitudes (degrees)
 
-    real(dp), intent(in), target :: lons(:)
+    real(sp), intent(in), target :: lons(:)
     !! list of longitudes (degrees). These can be within any range.
 
     ! variables used for kd-tree creation loop... too lazy to document what they all are, sorry.
@@ -166,7 +166,7 @@ contains
     do n=1, size(lons)
        root%pts_ll(n,1) = lons(n)*pi/180.0e0
        root%pts_ll(n,2) = lats(n)*pi/180.0e0
-       root%pts(n,:) = ll2xyz( lons(n), lats(n) )
+       root%pts(n,:) = ll2xyz( lons(n)*1.0_dp, lats(n)*1.0_dp )
     end do
 
     ! calculate the number of kd boxes needed and create memory for them
@@ -256,13 +256,13 @@ contains
     type(kd_root), intent(in) :: root
     !! root node containing all the information about the kd-tree
 
-    real(dp), intent(in) :: s_lon
+    real(sp), intent(in) :: s_lon
     !! The longitude of the center of the search location (degrees)
 
-    real(dp), intent(in) :: s_lat
+    real(sp), intent(in) :: s_lat
     !! The latitude of the center of the search location (degrees)
 
-    real(dp), intent(in) :: s_radius
+    real(sp), intent(in) :: s_radius
     !! the radius of the search (meters)
 
     integer, intent(out) :: r_points(:)
@@ -270,7 +270,7 @@ contains
     !! this is an array of indexes pointing to the original lat/lon arrays passed into kd_init().
     !! Array passed in should be the same size as "r_distance".
 
-    real(dp), intent(out) :: r_distance(:)
+    real(sp), intent(out) :: r_distance(:)
     !! the distance (meters) between each found point and the given search point.
     !! Array passed in should be the same size as "r_points"
 
@@ -302,7 +302,7 @@ contains
     end if
 
     ! convert search point to x/y/z
-    s_xyz = ll2xyz(s_lon, s_lat)
+    s_xyz = ll2xyz(s_lon*1.0_dp, s_lat*1.0_dp)
 
     ! find the smallest box that completely contains the bounds of the search point
     nb = 1
@@ -401,10 +401,10 @@ contains
     type(kd_root), intent(in) :: root
     !! root node containing all the information about the kd-tree
 
-    real(dp), intent(in) :: s_lon
+    real(sp), intent(in) :: s_lon
     !! The longitude of the center of the search location (degrees)
 
-    real(dp), intent(in) :: s_lat
+    real(sp), intent(in) :: s_lat
     !! The latitude of the center of the search location (degrees)
 
     integer, intent(in) :: s_num
@@ -414,7 +414,7 @@ contains
     !! the resulting list of points that are found,
     !! this is an array of indexes pointing to the original lat/lon arrays passed into kd_init
 
-    real(dp), intent(out) :: r_distance(:)
+    real(sp), intent(out) :: r_distance(:)
     !! the distance (meters) between each found point and the given search point
 
     integer, intent(out) :: r_num
@@ -443,7 +443,7 @@ contains
     dn = 1e20
 
     ! convert search point to xyz
-    s_xyz = ll2xyz(s_lon, s_lat)
+    s_xyz = ll2xyz(s_lon * 1.0_dp, s_lat*1.0_dp)
 
     ! find the smallest mother box with enough points to initialize the heap
     kp = kd_locate(root, s_xyz)
@@ -671,9 +671,9 @@ contains
     real(dp) :: ll2xyz(3)
     !! resulting x/y/z (meters)
 
-    ll2xyz(1) = re * cos(lat*pi/180.0) * cos(lon*pi/180.0)
-    ll2xyz(2) = re * cos(lat*pi/180.0) * sin(lon*pi/180.0)
-    ll2xyz(3) = re * sin(lat*pi/180.0)
+    ll2xyz(1) = re * cos(lat*pi/180.0d0) * cos(lon*pi/180.0d0)
+    ll2xyz(2) = re * cos(lat*pi/180.0d0) * sin(lon*pi/180.0d0)
+    ll2xyz(3) = re * sin(lat*pi/180.0d0)
 
   end function ll2xyz
 
